@@ -1,10 +1,24 @@
 # Kimi Work for Linux
 
-Unofficial Linux x86_64 packaging for Kimi Work 3.1.3. This repository contains
-only the reproducible porting and build tooling; it does not contain the source
-DMG, extracted application, dependencies, or generated binaries.
+Unofficial Linux x86_64 packaging for Kimi Work 3.1.3. The Git repository
+contains only the reproducible porting and build tooling. It does not track the
+source DMG, extracted application, dependency trees, or generated artifacts.
+The packaged AppImage, portable archive, Pacman package, and their checksums are
+published separately as GitHub Release downloads.
 
 Release: [`v3.1.3-linux.1`](https://github.com/lemon07r/Kimi-Work-Linux/releases/tag/v3.1.3-linux.1)
+
+## Why I made this
+
+I made this port because I wanted a way to use my free Kimi membership credits
+on Linux.
+
+Shameless self-plug: if this project is useful and you want to support me, use
+[my Kimi referral link](https://kimi-bot.com/activities/viral-referral/share?scenario=invite&from=share_poster&invitation_code=HY39PH).
+Kimi says we both get a guaranteed benefit, potentially up to one year of
+membership credits. If you would rather use someone else's referral link,
+that's fine too—you can still get free membership credits to use with Kimi
+Work.
 
 ## Supported systems
 
