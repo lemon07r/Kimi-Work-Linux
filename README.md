@@ -6,7 +6,7 @@ source DMG, extracted application, dependency trees, or generated artifacts.
 The packaged AppImage, portable archive, Pacman package, and their checksums are
 published separately as GitHub Release downloads.
 
-Release: [`v3.1.3-linux.1`](https://github.com/lemon07r/Kimi-Work-Linux/releases/tag/v3.1.3-linux.1)
+Release: [`v3.1.3-linux.2`](https://github.com/lemon07r/Kimi-Work-Linux/releases/tag/v3.1.3-linux.2)
 
 ## Why I made this
 
@@ -37,13 +37,14 @@ The port replaces the incompatible macOS platform layer with:
 - Node.js 24.15.0 for Linux x64
 - CPython 3.12.13 (python-build-standalone release 20260718)
 - uv 0.11.29 for Linux x64
+- Kimi WebBridge 1.11.3 for Linux x64
 - Linux builds of the daemon and gateway native Node modules
 - Kimi's Linux-specific `inside_install.sh` PPT tool bootstrap
 
 ## Install
 
 Download an artifact and `SHA256SUMS` from the
-[GitHub release](https://github.com/lemon07r/Kimi-Work-Linux/releases/tag/v3.1.3-linux.1).
+[GitHub release](https://github.com/lemon07r/Kimi-Work-Linux/releases/tag/v3.1.3-linux.2).
 
 Arch Linux or CachyOS:
 
@@ -118,15 +119,35 @@ bun audit
 bun run verify
 ```
 
-The verifier checks the bundled Node, Python, and uv runtimes; exercises SQLite
-and PTY modules; imports gateway native modules; scans for Mach-O, ARM, and
-other wrong-architecture binaries; validates the portable and Pacman package
+The verifier checks the bundled Node, Python, uv, and WebBridge runtimes;
+exercises SQLite and PTY modules; imports gateway native modules; scans for
+Mach-O, ARM, and other wrong-architecture binaries; confirms the pinned
+WebBridge digest in every package; validates the portable and Pacman package
 metadata; and verifies every digest in `SHA256SUMS`.
+
+## Browser control with Kimi WebBridge
+
+WebBridge is optional for using Kimi Work, but it is required when you want
+Kimi to control your browser. Install Moonshot's official
+[Kimi WebBridge Chrome extension](https://chromewebstore.google.com/detail/kimi-webbridge/fldmhceldgbpfpkbgopacenieobmligc);
+the bundled WebBridge 1.11.3 daemon is installed and supervised automatically
+by Kimi Work. Moonshot's [manual setup page](https://www.kimi.com/features/webbridge)
+has additional setup and troubleshooting instructions.
+
+Browser control necessarily grants broad access. The extension can open pages,
+click and type in them, and read website content using your existing browser
+sessions. Its Chrome Web Store disclosure says it handles web history, user
+activity, and website content. Install it only in a browser profile whose data
+you are comfortable making available to Kimi-driven tasks, and review each task
+before allowing sensitive or irreversible actions.
+
+The vendor-provided WebBridge daemon also emits its own operational telemetry.
+That behavior is part of Moonshot's binary rather than this Linux packaging
+tooling; consult Moonshot's WebBridge information and privacy disclosures when
+deciding whether to enable browser control.
 
 ## Limitations
 
-- Kimi's macOS-only `kimi-webbridge` helper has no vendor Linux build and is
-  omitted. Browser automation through Kimi WebBridge is therefore unavailable.
 - This is an unofficial port and is not supported by Moonshot AI.
 - Only Linux x86_64 is built and tested.
 - The packages do not use Moonshot's macOS update feed. Install newer port

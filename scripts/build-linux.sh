@@ -23,6 +23,10 @@ UV_VERSION="0.11.29"
 UV_ARCHIVE="uv-x86_64-unknown-linux-gnu.tar.gz"
 UV_URL="https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/${UV_ARCHIVE}"
 UV_SHA256="04f8b82f5d47f0512dcd32c67a4a6f16a0ea27c81537c338fd0ad6b23cebe829"
+WEBBRIDGE_VERSION="v1.11.3"
+WEBBRIDGE_ARCHIVE="kimi-webbridge-${WEBBRIDGE_VERSION}-linux-amd64"
+WEBBRIDGE_URL="https://cdn.kimi.com/webbridge/${WEBBRIDGE_VERSION}/releases/kimi-webbridge-linux-amd64"
+WEBBRIDGE_SHA256="5f89a15b6dcffa3c88837d3a8fab073fa8499a17f2cbe27f32d428c540f4b418"
 
 log() {
   printf '[kimi-linux] %s\n' "$*"
@@ -182,9 +186,16 @@ cp -a --reflink=auto "$SOURCE_RESOURCES/." "$LINUX_RESOURCES/"
 # neither application data nor valid portable Linux resources.
 find "$LINUX_RESOURCES" -type f -name '*:com.apple.*' -delete
 
-# The bundled helper is a Mach-O arm64 binary and has no vendor Linux release.
-# Omitting it makes the app's existing optional-helper check skip it cleanly.
-rm -f "$LINUX_RESOURCES/kimi-webbridge"
+# Replace the source DMG's Mach-O helper with Moonshot's matching Linux
+# release. The desktop process owns installation and supervision of this root
+# helper; the inner Daimon bundle intentionally keeps includesWebBridge=false.
+download_verified \
+  "$WEBBRIDGE_URL" \
+  "$CACHE_DIR/$WEBBRIDGE_ARCHIVE" \
+  "$WEBBRIDGE_SHA256"
+install -m 0755 \
+  "$CACHE_DIR/$WEBBRIDGE_ARCHIVE" \
+  "$LINUX_RESOURCES/kimi-webbridge"
 
 download_verified "$NODE_URL" "$CACHE_DIR/$NODE_ARCHIVE" "$NODE_SHA256"
 rm -rf "$BUILD_DIR/node"

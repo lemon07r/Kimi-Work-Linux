@@ -4,6 +4,7 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RESOURCES="$PROJECT_DIR/build/linux-resources"
 RESOURCES_ONLY=false
+WEBBRIDGE_SHA256="5f89a15b6dcffa3c88837d3a8fab073fa8499a17f2cbe27f32d428c540f4b418"
 
 if [ "$#" -gt 1 ]; then
   printf 'Usage: %s [--resources-only]\n' "$0" >&2
@@ -39,6 +40,7 @@ assert_x86_64_elf() {
 NODE_BIN="$RESOURCES/runtime/node"
 PYTHON_BIN="$RESOURCES/daimon-bundle/runtime/python/cpython-3.12/bin/python3.12"
 UV_BIN="$RESOURCES/daimon-bundle/runtime/uv/uv"
+WEBBRIDGE_BIN="$RESOURCES/kimi-webbridge"
 DAIMON_DIR="$RESOURCES/daimon-bundle/app/daimon"
 GATEWAY_DIR="$RESOURCES/gateway"
 
@@ -49,6 +51,16 @@ assert_x86_64_elf "$NODE_BIN" "Node runtime"
 assert_x86_64_elf "$PYTHON_BIN" "Python runtime"
 assert_x86_64_elf "$UV_BIN" "uv runtime"
 pass "Node, Python, and uv runtimes execute natively"
+
+[ -x "$WEBBRIDGE_BIN" ] || fail "Kimi WebBridge is missing or not executable"
+[ "$(sha256sum "$WEBBRIDGE_BIN" | cut -d ' ' -f 1)" = "$WEBBRIDGE_SHA256" ] ||
+  fail "Kimi WebBridge does not match the pinned v1.11.3 digest"
+assert_x86_64_elf "$WEBBRIDGE_BIN" "Kimi WebBridge"
+file "$WEBBRIDGE_BIN" | grep -q 'statically linked' ||
+  fail "Kimi WebBridge is not statically linked"
+"$WEBBRIDGE_BIN" --help | grep -q '^Kimi WebBridge daemon and toolkit$' ||
+  fail "Kimi WebBridge CLI failed to load"
+pass "Kimi WebBridge v1.11.3 is pinned, static, executable, and loadable"
 
 "$NODE_BIN" -e \
   'const db = require(process.argv[1]); const d = new db(":memory:"); console.log(d.prepare("select 1 as ok").get().ok); d.close()' \
@@ -97,11 +109,46 @@ pass "AppImage, tar.gz, and Pacman artifacts exist"
 assert_x86_64_elf "$APPIMAGE" "AppImage"
 pass "AppImage is a native Linux x86_64 executable"
 
+VERIFY_TMP="$(mktemp -d)"
+trap 'rm -rf "$VERIFY_TMP"' EXIT
+
 tar -tzf "$TARBALL" |
   awk '$0 == "Kimi-Work-3.1.3-linux-x64/kimi-work" { found = 1 }
     END { exit !found }' ||
   fail "Portable archive does not contain the expected executable"
 pass "Portable archive layout is valid"
+
+TARBALL_WEBBRIDGE="Kimi-Work-3.1.3-linux-x64/resources/resources/kimi-webbridge"
+mkdir -p "$VERIFY_TMP/tarball"
+tar -xzf "$TARBALL" -C "$VERIFY_TMP/tarball" "$TARBALL_WEBBRIDGE" ||
+  fail "Portable archive does not contain Kimi WebBridge"
+[ -x "$VERIFY_TMP/tarball/$TARBALL_WEBBRIDGE" ] ||
+  fail "Kimi WebBridge is not executable in the portable archive"
+[ "$(sha256sum "$VERIFY_TMP/tarball/$TARBALL_WEBBRIDGE" | cut -d ' ' -f 1)" = "$WEBBRIDGE_SHA256" ] ||
+  fail "Portable archive contains the wrong Kimi WebBridge"
+
+command -v bsdtar >/dev/null 2>&1 ||
+  fail "bsdtar is required to verify the Pacman package"
+PACMAN_WEBBRIDGE="opt/Kimi Work/resources/resources/kimi-webbridge"
+mkdir -p "$VERIFY_TMP/pacman"
+bsdtar -xf "$PACMAN_PACKAGE" -C "$VERIFY_TMP/pacman" "$PACMAN_WEBBRIDGE" ||
+  fail "Pacman package does not contain Kimi WebBridge"
+[ -x "$VERIFY_TMP/pacman/$PACMAN_WEBBRIDGE" ] ||
+  fail "Kimi WebBridge is not executable in the Pacman package"
+[ "$(sha256sum "$VERIFY_TMP/pacman/$PACMAN_WEBBRIDGE" | cut -d ' ' -f 1)" = "$WEBBRIDGE_SHA256" ] ||
+  fail "Pacman package contains the wrong Kimi WebBridge"
+
+mkdir -p "$VERIFY_TMP/appimage"
+(
+  cd "$VERIFY_TMP/appimage"
+  "$APPIMAGE" --appimage-extract "resources/resources/kimi-webbridge" >/dev/null
+) || fail "AppImage does not contain Kimi WebBridge"
+APPIMAGE_WEBBRIDGE="$VERIFY_TMP/appimage/squashfs-root/resources/resources/kimi-webbridge"
+[ -x "$APPIMAGE_WEBBRIDGE" ] ||
+  fail "Kimi WebBridge is not executable in the AppImage"
+[ "$(sha256sum "$APPIMAGE_WEBBRIDGE" | cut -d ' ' -f 1)" = "$WEBBRIDGE_SHA256" ] ||
+  fail "AppImage contains the wrong Kimi WebBridge"
+pass "Every package contains the executable pinned Kimi WebBridge"
 
 if command -v pacman >/dev/null 2>&1; then
   PACMAN_METADATA="$(pacman -Qip "$PACMAN_PACKAGE")" ||
