@@ -1,0 +1,37 @@
+# Proprietary inputs and extracted application content
+*.dmg
+extracted/
+app-source/
+
+# Dependencies, caches, and generated packages
+node_modules/
+build/
+dist/
+out/
+.cache/
+coverage/
+*.AppImage
+*.pacman
+*.tar.gz
+SHA256SUMS
+
+# Logs and local environment
+*.log
+npm-debug.log*
+bun-debug.log*
+.env
+.env.*
+!.env.example
+
+# Agent/editor-local state
+.agents/
+.agent-browser/
+.codex/
+.claude/
+.idea/
+.vscode/
+skills-lock.json
+
+# OS metadata
+.DS_Store
+*:com.apple.*

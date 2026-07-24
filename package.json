@@ -1,0 +1,32 @@
+{
+  "name": "kimi-work-linux-port",
+  "version": "3.1.3",
+  "private": true,
+  "description": "Reproducible Linux x64 packaging harness for Kimi Work 3.1.3",
+  "license": "MIT",
+  "author": "lemon07r",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lemon07r/Kimi-Work-Linux.git"
+  },
+  "homepage": "https://github.com/lemon07r/Kimi-Work-Linux#readme",
+  "bugs": {
+    "url": "https://github.com/lemon07r/Kimi-Work-Linux/issues"
+  },
+  "packageManager": "bun@1.3.14",
+  "engines": {
+    "bun": ">=1.3.0",
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "build": "bash scripts/build-linux.sh",
+    "prepare:linux": "bash scripts/build-linux.sh --prepare-only",
+    "package:linux": "electron-builder --linux AppImage tar.gz pacman --x64 --config electron-builder.yml",
+    "verify": "bash scripts/verify-linux.sh",
+    "check": "bash -n scripts/*.sh && node --check scripts/*.mjs"
+  },
+  "devDependencies": {
+    "@electron/asar": "3.4.1",
+    "electron-builder": "26.15.3"
+  }
+}

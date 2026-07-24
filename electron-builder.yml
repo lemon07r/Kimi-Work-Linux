@@ -1,0 +1,37 @@
+appId: com.moonshot.kimichat
+productName: Kimi Work
+copyright: Copyright © 2026 Moonshot AI
+electronVersion: 41.7.2
+asar: true
+npmRebuild: false
+
+directories:
+  app: build/linux-app
+  output: dist
+
+files:
+  - out/**/*
+  - assets/**/*
+  - package.json
+
+extraResources:
+  - from: build/linux-resources
+    to: resources
+
+protocols:
+  - name: Kimi Deep Link
+    schemes:
+      - kimi
+      - kimi-work
+
+linux:
+  target:
+    - AppImage
+    - tar.gz
+    - pacman
+  category: Office
+  executableName: kimi-work
+  icon: build/linux-app/assets/icon.png
+  syncDesktopName: true
+  maintainer: lemon07r
+  artifactName: Kimi-Work-${version}-linux-${arch}.${ext}
