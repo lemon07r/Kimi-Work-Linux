@@ -155,13 +155,17 @@ deciding whether to enable browser control.
 - Kimi's normal online services, account login, and network access are still
   required for features that depend on them.
 
-## Ownership, permission, and license
+## Project status and license
 
-This port is distributed with written permission from Moonshot AI. Kimi Work,
-the Kimi name and branding, the bundled application, and all associated
-proprietary code and assets remain the property of Moonshot AI and their
-respective owners. No ownership of those materials is claimed here.
+This is an independent community proof of concept for Linux compatibility and
+a temporary stopgap until Moonshot AI provides an official Linux release. It is
+not affiliated with, sponsored by, endorsed by, or supported by Moonshot AI. If
+an official Linux build becomes available, prefer that version.
+
+Kimi Work, Kimi WebBridge, the Kimi name and branding, and all associated
+proprietary code and assets belong to Moonshot AI and their respective owners.
+This project claims no ownership of those materials.
 
 The [MIT license](LICENSE) applies only to this repository's original Linux
-porting, packaging, and verification tooling. It does not relicense Kimi Work
-or any bundled third-party software.
+porting, packaging, and verification tooling. It does not grant rights to or
+relicense Kimi Work, Kimi WebBridge, or any other bundled third-party software.
